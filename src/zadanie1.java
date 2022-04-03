@@ -1,26 +1,50 @@
-class LowArray {
+class disorderArray {
     private long[] a;
     private int nElems;
 
-    public LowArray(int size) {
+    public disorderArray(int size) {
         a = new long[size];
     }
-    //    public void setElem(int index, long value) {
-//        a[index] = value;
-//    }
-//    public long getElem(int index) {
-//        return a[index];
-//    }
-//    public boolean find(long searchKey) {
-//        int j;
-//        for(j=0; j<nElems; j++)
-//            if(a[j] == searchKey)
-//                break;
-//        if(j == nElems)
-//            return false;
-//        else
-//            return true;
-//    }
+
+    public boolean find(long searchKey) {
+        int j;
+
+        for(j=0; j<nElems; j++)
+            if(a[j] == searchKey)
+                break;
+
+        return j != nElems;
+    }
+    public void insert(long value) {
+        a[nElems] = value;
+        nElems++;
+    }
+    public boolean delete(long value) {
+        int j;
+
+        for(j=0; j<nElems; j++)
+            if(value == a[j])
+                break;
+            if(j==nElems)
+                return false;
+            else {
+                for(int k=j; k<nElems; k++)
+                    a[k] = a[k+1];
+
+                nElems--;
+                return true;
+            }
+    }
+}
+
+class orderArray {
+    private long[] a;
+    private int nElems;
+
+    public orderArray(int size) {
+        a = new long[size];
+    }
+
     public int find(long searchKey) {
         int lowerBound = 0;
         int upperBound = nElems-1;
@@ -28,6 +52,7 @@ class LowArray {
 
         while(true) {
             curln = (lowerBound+upperBound)/2;
+
             if(a[curln]==searchKey)
                 return curln;
             else if(lowerBound>upperBound)
@@ -40,62 +65,48 @@ class LowArray {
             }
         }
     }
-//    public void insert(long value) {
-//        a[nElems] = value;
-//        nElems++;
-//    }
+
     public void insert(long value) {
         int j;
+
         for(j=0;j<nElems;j++)
             if(a[j]>value)
                 break;
-            for(int k=nElems; k>j; k--)
-                a[k] = a[k-1];
+        for(int k=nElems; k>j; k--)
+            a[k] = a[k-1];
+
         a[j] = value;
         nElems++;
     }
-//    public boolean delete(long value) {
-//        int j;
-//        for(j=0; j<nElems; j++)
-//            if(value == a[j])
-//                break;
-//            if(j==nElems)
-//                return false;
-//            else {
-//                for(int k=j; k<nElems; k++)
-//                    a[k] = a[k+1];
-//                nElems--;
-//                return true;
-//            }
-//    }
     public boolean delete(long value) {
         int j=find(value);
+
         if(j==nElems)
             return false;
         else {
             for(int k=j; k<nElems; k++)
                 a[k] = a[k+1];
+
             nElems--;
             return true;
         }
-    }
-    public void vivod() {
-        for(int j=0; j<a.length; j++)
-            System.out.println(a[j]);
     }
 }
 
 public class zadanie1 {
     public static void main(String[] args) {
-        LowArray aLowArray = new LowArray(10);
-        aLowArray.insert(1);
-        aLowArray.insert(10);
-        aLowArray.insert(3);
-//        aLowArray.vivod();
-        aLowArray.delete(1);
-        System.out.println(aLowArray.find(10));
-        aLowArray.vivod();
-//        aLowArray.setElem(1, 322);
-//        System.out.println(aLowArray.getElem(1));
+        disorderArray disArray = new disorderArray(10);
+        disArray.insert(1);
+        disArray.insert(10);
+        disArray.delete(1);
+        System.out.println(disArray.find(10));
+        System.out.println(disArray.find(1));
+
+        orderArray orArray = new orderArray(10);
+        orArray.insert(1);
+        orArray.insert(10);
+        orArray.delete(1);
+        System.out.println(orArray.find(10));
+        System.out.println(orArray.find(1));
     }
 }
