@@ -1,10 +1,20 @@
+class LowArray {
+    private long[] a;
+    public LowArray(int size) {
+        a = new long[size];
+    }
+    public void setElem(int index, long value) {
+        a[index] = value;
+    }
+    public long getElem(int index) {
+        return a[index];
+    }
+}
+
 public class zadanie1 {
     public static void main(String[] args) {
-//        int[] intArray;
-//        intArray = new int[100];
-        int intArray[] = new int[100];
-        int arrayLength = intArray.length;
-
-        System.out.println(arrayLength);
+        LowArray aLowArray = new LowArray(100);
+        aLowArray.setElem(1, 322);
+        System.out.println(aLowArray.getElem(1));
     }
 }
