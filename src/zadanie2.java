@@ -35,6 +35,10 @@ class disorderArray2 {
             return true;
         }
     }
+    public void vivod() {
+        for(int k=0; k<a.length; k++)
+            System.out.println(a[k]);
+    }
     public void bubbleSort() {
         int out, in;
         for (out=nElems-1; out>1; out--)
@@ -47,9 +51,45 @@ class disorderArray2 {
         a[one] = a[two];
         a[two] = temp;
     }
-    public void vivod() {
-        for(int k=0; k<a.length; k++)
-            System.out.println(a[k]);
+    public void choiceSort() {
+        System.out.println(System.currentTimeMillis());
+        long max = 0, c;
+        int Nmax, i, k;
+
+        for(i=0; i<nElems; i++) {
+            max = a[i];
+            Nmax = i;
+
+            for(k=0; k<nElems; k++)
+                if(a[k]>max) {
+                    max=a[k];
+                    Nmax=k;
+                }
+            c=a[i];
+            a[i]=max;
+            a[Nmax]=c;
+        }
+
+        System.out.println(System.currentTimeMillis());
+    }
+    public void insertSort() {
+        System.out.println(System.currentTimeMillis());
+        int i, j;
+        long temp;
+
+        for(i=1;i<nElems-1;i++) {
+            temp=a[i];
+            j=i;
+
+            if((a[j-1]>temp)&(j>0)) {
+                a[j]=a[j-1];
+                j=j-1;
+            }
+
+            a[j]=temp;
+        }
+
+        System.out.println(System.currentTimeMillis());
     }
 }
 
@@ -59,9 +99,14 @@ public class zadanie2 {
         newArray.insert(10);
         newArray.insert(1);
         newArray.insert(3);
+        newArray.insert(7);
+        newArray.insert(14);
         newArray.vivod();
         System.out.println("Sorted");
-        newArray.bubbleSort();
+//        newArray.bubbleSort();
+        newArray.choiceSort();
+        System.out.println("Sorted");
+        newArray.insertSort();
         newArray.vivod();
     }
 }
