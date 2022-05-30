@@ -131,23 +131,20 @@ class disorderArray2 implements arr {
 public class zadanie2 {
     public static void main(String[] args) {
         disorderArray2 arrayForIns = new disorderArray2();
-        disorderArray2 arrayForCho = arrayForIns;
-        disorderArray2 arrayForMer = arrayForIns;
-        disorderArray2 arrayForFas = arrayForIns;
 
-        System.out.println("Вставка");
+        System.out.println("Vstavka");
         arrayForIns.insertSort();
         System.out.println(Arrays.toString(arrayForIns.get()));
 
-        System.out.println("Выбор");
-        arrayForCho.choiceSort();
-        System.out.println(Arrays.toString(arrayForCho.get()));
+        System.out.println("Vibor");
+        arrayForIns.choiceSort();
+        System.out.println(Arrays.toString(arrayForIns.get()));
 
-        System.out.println("Слияние");
-        System.out.println(Arrays.toString(arrayForMer.mergeSort()));
+        System.out.println("Sliyanie");
+        System.out.println(Arrays.toString(arrayForIns.mergeSort()));
 
-        System.out.println("Быстрая");
-        arrayForFas.fastSort();
-        System.out.println(Arrays.toString(arrayForFas.get()));
+        System.out.println("Bistraya");
+        arrayForIns.fastSort();
+        System.out.println(Arrays.toString(arrayForIns.get()));
     }
 }
