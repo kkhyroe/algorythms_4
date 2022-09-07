@@ -1,9 +1,15 @@
+import java.util.Arrays;
+
 class disorderArray {
     private long[] a;
     private int nElems;
 
     public disorderArray(int size) {
         a = new long[size];
+    }
+
+    public long[] ret() {
+        return a;
     }
 
     public boolean find(long searchKey) {
@@ -43,6 +49,10 @@ class orderArray {
 
     public orderArray(int size) {
         a = new long[size];
+    }
+
+    public long[] ret() {
+        return a;
     }
 
     public int find(long searchKey) {
@@ -96,16 +106,25 @@ class orderArray {
 public class zadanie1 {
     public static void main(String[] args) {
         disorderArray disArray = new disorderArray(10);
-        disArray.insert(1);
+        System.out.println(Arrays.toString(disArray.ret()));
         disArray.insert(10);
+        System.out.println(Arrays.toString(disArray.ret()));
+        disArray.insert(1);
+        System.out.println(Arrays.toString(disArray.ret()));
         disArray.delete(1);
+        System.out.println(Arrays.toString(disArray.ret()));
         System.out.println(disArray.find(10));
         System.out.println(disArray.find(1));
 
         orderArray orArray = new orderArray(10);
-        orArray.insert(1);
+        System.out.println(Arrays.toString(orArray.ret()));
+
         orArray.insert(10);
+        System.out.println(Arrays.toString(orArray.ret()));
+        orArray.insert(1);
+        System.out.println(Arrays.toString(orArray.ret()));
         orArray.delete(1);
+        System.out.println(Arrays.toString(orArray.ret()));
         System.out.println(orArray.find(10));
         System.out.println(orArray.find(1));
     }
