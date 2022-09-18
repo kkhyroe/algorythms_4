@@ -387,6 +387,46 @@ class DoubleLink {
     }
 }
 
+class Person {
+    Person next;
+
+    String name;
+    String lastName;
+}
+
+class PersonLink {
+    private Person first;
+
+    public void insert(String name, String lastName){ // Вставка в порядке сортировки
+        Person newLink = new Person(); // Создание нового элемента
+        newLink.name = name;
+        newLink.lastName = lastName;
+        Person previous = null; // От начала списка
+        Person current = first;
+// До конца списка
+        while(current != null && (newLink.name.compareTo(current.name)) >= 0) { // или если key > current,
+            previous = current;
+            current = current.next; // Перейти к следующему элементу
+        }
+        if(previous==null) // В начале списка
+            first = newLink; // first --> newLink
+        else // Не в начале
+            previous.next = newLink; // старое значение prev --> newLink
+        newLink.next = current; // newLink --> старое значение current
+    }
+
+    public void printList()                //печать списка
+    {
+        Person current = this.first;       //получаем ссылку на первый элемент
+        while (current != null)           //пока элемент существуе
+        {
+            System.out.print(current.name + " " + current.lastName + " / "); //печатаем его данные
+            current = current.next;                     //и переключаемся на следующий
+        }
+        System.out.println();
+    }
+}
+
 public class zadanie4 {
     public static void main(String[] args) {
         Link l = new Link();
@@ -456,5 +496,14 @@ public class zadanie4 {
         dbl.printList();
         System.out.println("Скорость");
         dbl.checkSpeed();
+
+        System.out.println("------------------------------------------");
+
+        PersonLink p = new PersonLink();
+        p.insert("Roma", "Suchev");
+        p.insert("Dima", "Komov");
+        p.insert("Sasha", "Qoter");
+        System.out.println("Сортированный список вставкой");
+        p.printList();
     }
 }
