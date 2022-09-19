@@ -1,8 +1,45 @@
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+class TreeViewer extends JFrame
+{
+    JLabel label1;
+
+    TreeViewer()
+    {
+        label1 = new JLabel();
+        label1.setText("welcome");
+        getContentPane().add(label1);
+    }
+}
+
 class TreeNode
 {
     int data;
     TreeNode leftChild;
     TreeNode rightChild;
+
+    TreeNode(Integer data) {
+        this.data = data;
+    }
+
+    public void print()
+    {
+        print("", this, false);
+    }
+
+    public void print(String prefix, TreeNode n, boolean isLeft)
+    {
+        if (n != null) {
+            System.out.println (prefix + (isLeft ? "|-- " : "\\-- ") + n.data);
+            print(prefix + (isLeft ? "|   " : "    "), n.leftChild, true);
+            print(prefix + (isLeft ? "|   " : "    "), n.rightChild, false);
+        }
+    }
 
     public void displayNode()
     {
@@ -14,12 +51,11 @@ class TreeNode
 
 class Tree
 {
-    private TreeNode root;
+    public TreeNode root;
 
     public void  insert(int id)
     {
-        TreeNode newNode = new TreeNode();
-        newNode.data = id;
+        TreeNode newNode = new TreeNode(id);
 
         if (root == null)
             root = newNode;
@@ -64,7 +100,8 @@ class Tree
         return  current;
     }
 
-    public TreeNode delete(int key) {
+    public TreeNode delete(int key)
+    {
         TreeNode current = root;
         TreeNode parent = root;
         boolean isLeftChild = true;
@@ -131,8 +168,50 @@ class Tree
         }
         return current;
     }
+
+    public void getTree()
+    {
+        TreeNode localRoot = root;
+        preorder(localRoot);
+    }
+
+    private void preorder(TreeNode localRoot)
+    {
+        System.out.print(localRoot.data + " ");
+        if (localRoot.leftChild != null)
+            preorder(localRoot.leftChild);
+        if (localRoot.rightChild != null)
+            preorder(localRoot.rightChild);
+    }
 }
 
 public class zadanie5 {
-
+    public static void main(String[] args)
+    {
+        Tree tree = new Tree();
+        for(int i = 25; i<=50; i+=5){
+            tree.insert(i);
+            tree.insert(i-25);
+        }
+//        tree.delete(42);
+        tree.insert(-1);
+        tree.insert(-10);
+        tree.insert(-5);
+//        tree.insert(-20);
+//        tree.insert(17);
+//        tree.getTree();
+//
+//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//        System.setOut(new PrintStream(bos));
+        tree.root.print();
+//        System.out.println("example");
+//        JOptionPane.showMessageDialog(null, "Captured: " + '\n' + bos);
+//        JFrame frame = new JFrame();
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.setLayout(new BorderLayout());
+//        frame.add(bos);
+//        frame.setSize(200, 200);
+//        frame.setLocationRelativeTo(null);
+//        frame.setVisible(true);
+    }
 }
