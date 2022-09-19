@@ -48,6 +48,22 @@ class Tree
         }
     }
 
+    public TreeNode find(int key)
+    {
+        TreeNode current = root;
+
+        while (current.data != key) {
+            if (key < current.data)
+                current = current.leftChild;
+            else
+                current = current.rightChild;
+            if (current == null)
+                return null;
+        }
+
+        return  current;
+    }
+
     public void delete(int id)
     {
 
