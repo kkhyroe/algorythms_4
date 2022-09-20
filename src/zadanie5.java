@@ -5,7 +5,7 @@ import java.awt.*;
 
 abstract class NodePrinter
 {
-    abstract void nodeprint (TreeNode root);
+    abstract void nodeprint (TreeNode root, Tree tree);
     int max (int a, int b) { return Math.max(a, b); }
     int depth (TreeNode node)
     {
@@ -59,14 +59,115 @@ class TreeCanvas extends JPanel {
 }
 
 class CanvasPrinter extends NodePrinter {
-    void  nodeprint(TreeNode root)
+
+    JTree makeTree(TreeNode root, Container c)
     {
-        JFrame jf = new JFrame("123");
-        jf.setSize(400, 400);
-        jf.setLocationRelativeTo(null);
         JTree jt = new JTree(translate2SwingTree(root));
-        jf.add(jt);
+
+        c.add(jt, BorderLayout.NORTH);
         openSubnodes(0, jt);
+        return jt;
+
+    }
+    void  nodeprint(TreeNode root, Tree tree)
+    {
+        JFrame jf = new JFrame("Tree");
+
+        Container c = jf.getContentPane();
+
+
+        JPanel p1 = new JPanel();
+        p1.setLayout(new BorderLayout());
+        p1.setLayout(new GridLayout(2, 3, 10, 10));
+        jf.setSize(600, 600);
+        jf.setLocationRelativeTo(null);
+
+        JTree jt = makeTree(root, c);
+
+        final JTextField t1 = new JTextField(100);
+        t1.setFont(t1.getFont().deriveFont(Font.BOLD, 50f));
+
+        final JButton n1 = new JButton("Add");
+        n1.addActionListener(e -> {
+            String global = t1.getText();
+            try {
+                int globalInt = Integer.parseInt(global);
+                tree.insert(globalInt);
+                Component[] cList = c.getComponents();
+
+                for(Component comp : cList){
+
+                    //Find the components you want to remove
+                    if(comp instanceof JTree){
+
+                        //Remove it
+                        c.remove(comp);
+                    }
+                }
+                c.revalidate();
+                c.repaint();
+                makeTree(root, c);
+            } catch (NumberFormatException err) {
+                t1.setText("Ошибка (текст)");
+            }
+        });
+
+        final JTextField t2 = new JTextField(100);
+        t2.setFont(t2.getFont().deriveFont(Font.BOLD, 50f));
+
+        final JButton n2 = new JButton("Find");
+        n2.addActionListener(e -> {
+            String global = t2.getText();
+            try {
+                int globalInt = Integer.parseInt(global);
+                if (tree.find(globalInt) != null)
+                    t2.setText("Нашел: " + tree.find(globalInt).data);
+                else
+                    t2.setText("Не нашел");
+            } catch (NumberFormatException err) {
+                t2.setText("Ошибка (текст)");
+            }
+        });
+
+
+        final JTextField t3 = new JTextField(100);
+        t3.setFont(t3.getFont().deriveFont(Font.BOLD, 50f));
+
+        final JButton n3 = new JButton("Delete");
+        n3.addActionListener(e -> {
+            String global = t3.getText();
+            try {
+                int globalInt = Integer.parseInt(global);
+                tree.delete(globalInt);
+                Component[] cList = c.getComponents();
+
+                for(Component comp : cList){
+
+                    //Find the components you want to remove
+                    if(comp instanceof JTree){
+
+                        //Remove it
+                        c.remove(comp);
+                    }
+                }
+                c.revalidate();
+                c.repaint();
+                makeTree(root, c);
+            } catch (NumberFormatException err) {
+                t3.setText("Ошибка (текст)");
+            }
+        });
+
+
+        p1.add(t1);
+        p1.add(t2);
+        p1.add(t3);
+        p1.add(n1);
+        p1.add(n2);
+        p1.add(n3);
+        c.add(p1);
+
+
         jf.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         jf.setVisible(true);
     }
@@ -266,6 +367,6 @@ public class zadanie5 {
         }
 
         CanvasPrinter printer = new CanvasPrinter();
-        printer.nodeprint(tree.root);
+        printer.nodeprint(tree.root, tree);
     }
 }
