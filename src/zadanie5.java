@@ -1,19 +1,90 @@
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 
-class TreeViewer extends JFrame
+abstract class NodePrinter
 {
-    JLabel label1;
-
-    TreeViewer()
+    abstract void nodeprint (TreeNode root);
+    int max (int a, int b) { return Math.max(a, b); }
+    int depth (TreeNode node)
     {
-        label1 = new JLabel();
-        label1.setText("welcome");
-        getContentPane().add(label1);
+        if (node.leftChild == null && node.rightChild == null) return 1;
+        if (node.leftChild == null) return 1 + depth(node.rightChild);
+        if (node.rightChild == null) return 1 + depth(node.leftChild);
+        return 1 + max (depth(node.leftChild), depth(node.rightChild));
+    }
+}
+
+class TreeCanvas extends JPanel {
+    private TreeNode root;
+    private NodePrinter np;
+
+    public TreeCanvas(TreeNode root, NodePrinter np) {
+        this.root = root;
+        this.np = np;
+        d = np.depth(root);
+        rows = (2 * d);
+        cols = 2 << d;
+    }
+
+    private int d;
+    private  int rows;
+    private int cols;
+
+    public void paint(Graphics g) {
+        Dimension dim = getSize();
+        int xf = dim.width;
+        int yf = dim.height;
+        int fontsize = (xf + yf) / 2;
+        g.setFont(g.getFont().deriveFont(fontsize * 1.5f));
+        xyPrint(root, dim.width/2, dim.width/2, 1, xf, yf, g);
+    }
+
+    void  xyPrint(TreeNode node, int x, int dx, int y, int xf, int yf, Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setStroke(new BasicStroke(3.0f));
+
+        g.drawString("" + node.data, x - xf, (y + 1) * yf);
+        g.setColor(Color.BLACK);
+        if (node.leftChild != null) {
+            g.drawLine(x - (dx / 2) + xf, (y + 2) * yf, x, (y + 1) * yf);
+            xyPrint(node.leftChild, x - dx / 2, dx / 2, y + 2, xf, yf, g);
+        }
+        if (node.rightChild != null) {
+            g.drawLine (x + xf, (y + 1) * yf, x + (dx / 2), (y + 2) * yf); // line down
+            xyPrint (node.rightChild, x + dx / 2, dx / 2, y + 2, xf, yf, g);
+        }
+    }
+}
+
+class CanvasPrinter extends NodePrinter {
+    void  nodeprint(TreeNode root)
+    {
+        JFrame jf = new JFrame("123");
+        jf.setSize(400, 400);
+        jf.setLocationRelativeTo(null);
+        JTree jt = new JTree(translate2SwingTree(root));
+        jf.add(jt);
+        openSubnodes(0, jt);
+        jf.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        jf.setVisible(true);
+    }
+
+    void openSubnodes (int row, JTree jt) {
+        TreePath tp = jt.getPathForRow(row);
+        jt.expandRow(row);
+        if (tp.isDescendant(jt.getPathForRow(row + 1)))
+            openSubnodes(row + 1, jt);
+    }
+
+    DefaultMutableTreeNode translate2SwingTree (TreeNode ast) {
+        DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode("" + ast.data);
+        if (ast.leftChild != null)
+            dmtn.add(translate2SwingTree(ast.leftChild));
+        if (ast.rightChild != null)
+            dmtn.add(translate2SwingTree(ast.rightChild));
+        return dmtn;
     }
 }
 
@@ -193,25 +264,8 @@ public class zadanie5 {
             tree.insert(i);
             tree.insert(i-25);
         }
-//        tree.delete(42);
-        tree.insert(-1);
-        tree.insert(-10);
-        tree.insert(-5);
-//        tree.insert(-20);
-//        tree.insert(17);
-//        tree.getTree();
-//
-//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//        System.setOut(new PrintStream(bos));
-        tree.root.print();
-//        System.out.println("example");
-//        JOptionPane.showMessageDialog(null, "Captured: " + '\n' + bos);
-//        JFrame frame = new JFrame();
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setLayout(new BorderLayout());
-//        frame.add(bos);
-//        frame.setSize(200, 200);
-//        frame.setLocationRelativeTo(null);
-//        frame.setVisible(true);
+
+        CanvasPrinter printer = new CanvasPrinter();
+        printer.nodeprint(tree.root);
     }
 }
