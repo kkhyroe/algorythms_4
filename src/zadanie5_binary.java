@@ -357,11 +357,11 @@ class Tree
     }
 }
 
-public class zadanie5 {
+public class zadanie5_binary {
     public static void main(String[] args)
     {
         Tree tree = new Tree();
-        for(int i = 25; i<=50; i+=5){
+        for(int i = 25; i<=10; i+=5){
             tree.insert(i);
             tree.insert(i-25);
         }
