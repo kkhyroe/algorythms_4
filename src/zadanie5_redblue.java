@@ -3,19 +3,16 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 
-import static java.awt.Color.BLACK;
-import static java.awt.Color.RED;
-
 abstract class RBNodePrinter
 {
     abstract void nodePrint (RBNode root, RBTree tree);
     int max (int a, int b) { return Math.max(a, b); }
     int depth(RBNode node)
     {
-        if (node.leftChild == null && node.rightChild == null) return 1;
-        if (node.leftChild == null) return 1 + depth(node.rightChild);
-        if (node.rightChild == null) return 1 + depth(node.leftChild);
-        return 1 + max (depth(node.leftChild), depth(node.rightChild));
+        if (node.left == null && node.right == null) return 1;
+        if (node.left == null) return 1 + depth(node.right);
+        if (node.right == null) return 1 + depth(node.left);
+        return 1 + max (depth(node.left), depth(node.right));
     }
 }
 
@@ -32,18 +29,18 @@ class RBCanvasPrinter extends RBNodePrinter {
     }
     void  nodePrint(RBNode root, RBTree tree)
     {
-        JFrame jf = new JFrame("Tree");
+        JFrame jf = new JFrame("Red-Black Tree");
+        jf.setSize(600, 600);
+        jf.setLocationRelativeTo(null);
 
         Container c = jf.getContentPane();
-
 
         JPanel p1 = new JPanel();
         p1.setLayout(new BorderLayout());
         p1.setLayout(new GridLayout(2, 3, 10, 10));
-        jf.setSize(600, 600);
-        jf.setLocationRelativeTo(null);
 
         JTree jt = makeTree(root, c);
+        openSubNodes(0, jt);
 
         final JTextField t1 = new JTextField(100);
         t1.setFont(t1.getFont().deriveFont(Font.BOLD, 50f));
@@ -51,20 +48,18 @@ class RBCanvasPrinter extends RBNodePrinter {
         final JButton n1 = new JButton("Add");
         n1.addActionListener(e -> {
             String global = t1.getText();
+
             try {
                 int globalInt = Integer.parseInt(global);
-                tree.insertNode(globalInt);
+                tree.insert(globalInt);
+
                 Component[] cList = c.getComponents();
 
-                for(Component comp : cList){
-
-                    //Find the components you want to remove
-                    if(comp instanceof JTree){
-
-                        //Remove it
+                for (Component comp : cList) {
+                    if (comp instanceof JTree)
                         c.remove(comp);
-                    }
                 }
+
                 c.revalidate();
                 c.repaint();
                 makeTree(root, c);
@@ -79,10 +74,12 @@ class RBCanvasPrinter extends RBNodePrinter {
         final JButton n2 = new JButton("Find");
         n2.addActionListener(e -> {
             String global = t2.getText();
+
             try {
                 int globalInt = Integer.parseInt(global);
-                if (tree.searchNode(globalInt) != null)
-                    t2.setText("Нашел: " + tree.searchNode(globalInt).data);
+
+                if (tree.searchTree(globalInt) != null)
+                    t2.setText("Нашел: " + tree.searchTree(globalInt).data);
                 else
                     t2.setText("Не нашел");
             } catch (NumberFormatException err) {
@@ -90,27 +87,24 @@ class RBCanvasPrinter extends RBNodePrinter {
             }
         });
 
-
         final JTextField t3 = new JTextField(100);
         t3.setFont(t3.getFont().deriveFont(Font.BOLD, 50f));
 
         final JButton n3 = new JButton("Delete");
         n3.addActionListener(e -> {
             String global = t3.getText();
+
             try {
                 int globalInt = Integer.parseInt(global);
                 tree.deleteNode(globalInt);
+
                 Component[] cList = c.getComponents();
 
-                for(Component comp : cList){
-
-                    //Find the components you want to remove
-                    if(comp instanceof JTree){
-
-                        //Remove it
+                for (Component comp : cList){
+                    if (comp instanceof JTree)
                         c.remove(comp);
-                    }
                 }
+
                 c.revalidate();
                 c.repaint();
                 makeTree(root, c);
@@ -119,15 +113,14 @@ class RBCanvasPrinter extends RBNodePrinter {
             }
         });
 
-
         p1.add(t1);
         p1.add(t2);
         p1.add(t3);
         p1.add(n1);
         p1.add(n2);
         p1.add(n3);
-        c.add(p1);
 
+        c.add(p1);
 
         jf.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         jf.setVisible(true);
@@ -136,362 +129,339 @@ class RBCanvasPrinter extends RBNodePrinter {
     void openSubNodes (int row, JTree jt) {
         TreePath tp = jt.getPathForRow(row);
         jt.expandRow(row);
+
         if (tp.isDescendant(jt.getPathForRow(row + 1)))
             openSubNodes(row + 1, jt);
     }
 
     DefaultMutableTreeNode translate2SwingTree (RBNode ast) {
-        DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode("" + ast.data);
-        if (ast.leftChild != null)
-            dmtn.add(translate2SwingTree(ast.leftChild));
-        if (ast.rightChild != null)
-            dmtn.add(translate2SwingTree(ast.rightChild));
+        DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode("" + ast.data + (ast.color == 1 ? " red" : " black"));
+
+        if (ast.left != null)
+            dmtn.add(translate2SwingTree(ast.left));
+        if (ast.right != null)
+            dmtn.add(translate2SwingTree(ast.right));
+
         return dmtn;
     }
 }
 
 class RBNode {
-    int data;
-
-    RBNode leftChild;
-    RBNode rightChild;
-    RBNode parent;
-
-    Color color;
-
-    public void print()
-    {
-        print("", this, false);
-    }
-
-    public void print(String prefix, RBNode n, boolean isLeft)
-    {
-        if (n != null) {
-            System.out.println (prefix + (isLeft ? "|-- " : "\\-- ") + n.data);
-            print(prefix + (isLeft ? "|   " : "    "), n.leftChild, true);
-            print(prefix + (isLeft ? "|   " : "    "), n.rightChild, false);
-        }
-    }
-
-    public RBNode(int data) {
-        this.data = data;
-    }
-
-    public boolean isBlack() {
-        return this == null || this.color == BLACK;
-    }
+    int data; // holds the key
+    RBNode parent; // pointer to the parent
+    RBNode left; // pointer to left child
+    RBNode right; // pointer to right child
+    int color; // 1 . Red, 0 . Black
 }
 
 class RBTree {
     public RBNode root;
 
-    public void getTree()
-    {
-        RBNode localRoot = root;
-        preorder(localRoot);
+    private RBNode TNULL;
+
+    public RBTree() {
+        TNULL = new RBNode();
+        TNULL.color = 0;
+        TNULL.left = null;
+        TNULL.right = null;
+        root = TNULL;
     }
 
-    private void preorder(RBNode localRoot)
-    {
-        System.out.print(localRoot.data + " ");
-        if (localRoot.leftChild != null)
-            preorder(localRoot.leftChild);
-        if (localRoot.rightChild != null)
-            preorder(localRoot.rightChild);
+    private RBNode searchTreeHelper(RBNode node, int key) {
+        if (node == TNULL || key == node.data)
+            return node;
+
+        if (key < node.data)
+            return searchTreeHelper(node.left, key);
+
+        return searchTreeHelper(node.right, key);
     }
 
-    private void replaceParentsChild(RBNode parent, RBNode oldChild, RBNode newChild) {
-        if (parent == null)
-            root = newChild;
-        else if (parent.leftChild == oldChild)
-            parent.leftChild = newChild;
-        else if (parent.rightChild == oldChild)
-            parent.rightChild = newChild;
-        else
-            throw new IllegalStateException("Узел не потомок своего родителя");
+    // fix the rb tree modified by the delete operation
+    private void fixDelete(RBNode x) {
+        RBNode s;
+        while (x != root && x.color == 0) {
+            if (x == x.parent.left) {
+                s = x.parent.right;
+                if (s.color == 1) {
+                    // case 3.1
+                    s.color = 0;
+                    x.parent.color = 1;
+                    leftRotate(x.parent);
+                    s = x.parent.right;
+                }
 
-        if (newChild != null)
-            newChild.parent = parent;
+                if (s.left.color == 0 && s.right.color == 0) {
+                    // case 3.2
+                    s.color = 1;
+                    x = x.parent;
+                } else {
+                    if (s.right.color == 0) {
+                        // case 3.3
+                        s.left.color = 0;
+                        s.color = 1;
+                        rightRotate(s);
+                        s = x.parent.right;
+                    }
+
+                    // case 3.4
+                    s.color = x.parent.color;
+                    x.parent.color = 0;
+                    s.right.color = 0;
+                    leftRotate(x.parent);
+                    x = root;
+                }
+            } else {
+                s = x.parent.left;
+                if (s.color == 1) {
+                    // case 3.1
+                    s.color = 0;
+                    x.parent.color = 1;
+                    rightRotate(x.parent);
+                    s = x.parent.left;
+                }
+
+                if (s.right.color == 0 && s.right.color == 0) {
+                    // case 3.2
+                    s.color = 1;
+                    x = x.parent;
+                } else {
+                    if (s.left.color == 0) {
+                        // case 3.3
+                        s.right.color = 0;
+                        s.color = 1;
+                        leftRotate(s);
+                        s = x.parent.left;
+                    }
+
+                    // case 3.4
+                    s.color = x.parent.color;
+                    x.parent.color = 0;
+                    s.left.color = 0;
+                    rightRotate(x.parent);
+                    x = root;
+                }
+            }
+        }
+        x.color = 0;
     }
 
-    private void rotateRight(RBNode node) {
-        RBNode parent = node.parent;
-        RBNode leftChild = node.leftChild;
-
-        node.leftChild = leftChild.rightChild;
-        if (leftChild.rightChild != null)
-            leftChild.rightChild.parent = node;
-
-        leftChild.rightChild = node;
-        node.parent = leftChild;
-
-        replaceParentsChild(parent, node, leftChild);
+    private void rbTransplant(RBNode u, RBNode v){
+        if (u.parent == null) {
+            root = v;
+        } else if (u == u.parent.left){
+            u.parent.left = v;
+        } else {
+            u.parent.right = v;
+        }
+        v.parent = u.parent;
     }
 
-    private void rotateLeft(RBNode node) {
-        RBNode parent = node.parent;
-        RBNode rightChild = node.rightChild;
+    private void deleteNodeHelper(RBNode node, int key) {
+        // find the node containing key
+        RBNode z = TNULL;
+        RBNode x, y;
+        while (node != TNULL){
+            if (node.data == key) {
+                z = node;
+            }
 
-        node.leftChild = rightChild.leftChild;
-        if (rightChild.leftChild != null)
-            rightChild.leftChild.parent = node;
-
-        rightChild.leftChild = node;
-        node.parent = rightChild;
-
-        replaceParentsChild(parent, node, rightChild);
-    }
-
-    public RBNode searchNode(int key) {
-        RBNode node = root;
-
-        while(node != null) {
-            if (key == node.data)
-                return node;
-            else if (key < node.data)
-                node = node.leftChild;
-            else
-                node = node.rightChild;
+            if (node.data <= key) {
+                node = node.right;
+            } else {
+                node = node.left;
+            }
         }
 
+        if (z == TNULL) {
+            System.out.println("Couldn't find key in the tree");
+            return;
+        }
+
+        y = z;
+        int yOriginalColor = y.color;
+        if (z.left == TNULL) {
+            x = z.right;
+            rbTransplant(z, z.right);
+        } else if (z.right == TNULL) {
+            x = z.left;
+            rbTransplant(z, z.left);
+        } else {
+            y = minimum(z.right);
+            yOriginalColor = y.color;
+            x = y.right;
+            if (y.parent == z) {
+                x.parent = y;
+            } else {
+                rbTransplant(y, y.right);
+                y.right = z.right;
+                y.right.parent = y;
+            }
+
+            rbTransplant(z, y);
+            y.left = z.left;
+            y.left.parent = y;
+            y.color = z.color;
+        }
+        if (yOriginalColor == 0){
+            fixDelete(x);
+        }
+    }
+
+    // fix the red-black tree
+    private void fixInsert(RBNode k){
+        RBNode u;
+        while (k.parent.color == 1) {
+            if (k.parent == k.parent.parent.right) {
+                u = k.parent.parent.left; // uncle
+                if (u.color == 1) {
+                    // case 3.1
+                    u.color = 0;
+                    k.parent.color = 0;
+                    k.parent.parent.color = 1;
+                    k = k.parent.parent;
+                } else {
+                    if (k == k.parent.left) {
+                        // case 3.2.2
+                        k = k.parent;
+                        rightRotate(k);
+                    }
+                    // case 3.2.1
+                    k.parent.color = 0;
+                    k.parent.parent.color = 1;
+                    leftRotate(k.parent.parent);
+                }
+            } else {
+                u = k.parent.parent.right; // uncle
+
+                if (u.color == 1) {
+                    // mirror case 3.1
+                    u.color = 0;
+                    k.parent.color = 0;
+                    k.parent.parent.color = 1;
+                    k = k.parent.parent;
+                } else {
+                    if (k == k.parent.right) {
+                        // mirror case 3.2.2
+                        k = k.parent;
+                        leftRotate(k);
+                    }
+                    // mirror case 3.2.1
+                    k.parent.color = 0;
+                    k.parent.parent.color = 1;
+                    rightRotate(k.parent.parent);
+                }
+            }
+            if (k == root) {
+                break;
+            }
+        }
+        root.color = 0;
+    }
+
+    // search the tree for the key k
+    // and return the corresponding node
+    public RBNode searchTree(int key) {
+        return searchTreeHelper(this.root, key);
+    }
+
+    // find the node with the minimum key
+    public RBNode minimum(RBNode node) {
+        while (node.left != TNULL) {
+            node = node.left;
+        }
         return node;
     }
 
-    private RBNode getUncle(RBNode parent) {
-        RBNode grandparent = parent.parent;
-        if (grandparent.leftChild == parent) {
-            return grandparent.rightChild;
-        } else if (grandparent.rightChild == parent) {
-            return grandparent.leftChild;
+    // rotate left at node x
+    public void leftRotate(RBNode x) {
+        RBNode y = x.right;
+        x.right = y.left;
+        if (y.left != TNULL) {
+            y.left.parent = x;
+        }
+        y.parent = x.parent;
+        if (x.parent == null) {
+            this.root = y;
+        } else if (x == x.parent.left) {
+            x.parent.left = y;
         } else {
-            throw new IllegalStateException("Родитель не является потомком своего родителя");
+            x.parent.right = y;
         }
+        y.left = x;
+        x.parent = y;
     }
 
-    private void fixedRBPropertiesAfterInsert(RBNode node) {
-        RBNode parent = node.parent;
-
-        if (parent == null) {
-            return;
+    // rotate right at node x
+    public void rightRotate(RBNode x) {
+        RBNode y = x.left;
+        x.left = y.right;
+        if (y.right != TNULL) {
+            y.right.parent = x;
         }
-
-        if (parent.color == BLACK)
-            return;
-
-        RBNode grandparent = parent.parent;
-
-        if (grandparent == null) {
-            parent.color = BLACK;
-            return;
-        }
-
-        RBNode uncle = getUncle(parent);
-
-        if (uncle != null && uncle.color == RED) {
-            parent.color = BLACK;
-            grandparent.color = RED;
-            uncle.color = BLACK;
-
-            fixedRBPropertiesAfterInsert(grandparent);
-        } else if (parent == grandparent.leftChild) {
-            if (node == parent.rightChild) {
-                rotateLeft(parent);
-
-                parent = node;
-            }
-
-            rotateRight(grandparent);
-
-            parent.color = BLACK;
-            grandparent.color = RED;
+        y.parent = x.parent;
+        if (x.parent == null) {
+            this.root = y;
+        } else if (x == x.parent.right) {
+            x.parent.right = y;
         } else {
-            if (node == parent.leftChild) {
-                rotateRight(parent);
-
-                parent = node;
-            }
-
-            rotateLeft(grandparent);
-
-            parent.color = BLACK;
-            grandparent.color = RED;
+            x.parent.left = y;
         }
+        y.right = x;
+        x.parent = y;
     }
 
-    public RBNode insertNode(int key) {
-        RBNode node = root;
-        RBNode parent = null;
+    // insert the key to the tree in its appropriate position
+    // and fix the tree
+    public void insert(int key) {
+        // Ordinary Binary Search Insertion
+        RBNode node = new RBNode();
+        node.parent = null;
+        node.data = key;
+        node.left = TNULL;
+        node.right = TNULL;
+        node.color = 1; // new node must be red
 
-        while(node != null) {
-            parent = node;
+        RBNode y = null;
+        RBNode x = this.root;
 
-            if (key < node.data)
-                node = node.leftChild;
-            else if (key > node.data)
-                node = node.rightChild;
-            else
-                throw new IllegalArgumentException("В дереве уже есть ключ " + key);
-        }
-
-        RBNode newNode = new RBNode(key);
-        newNode.color = RED;
-
-        if (parent == null)
-            root = newNode;
-        else if (key < parent.data)
-            parent.leftChild = newNode;
-        else
-            parent.rightChild = newNode;
-
-        newNode.parent = parent;
-
-        fixedRBPropertiesAfterInsert(newNode);
-
-        return newNode;
-    }
-
-    private static class LeafNode extends RBNode {
-        private LeafNode() {
-            super(0);
-            this.color = BLACK;
-        }
-    }
-
-    private RBNode deleteNodeWithZeroOrOneChild(RBNode node) {
-        if (node.leftChild != null) {
-            replaceParentsChild(node.parent, node, node.leftChild);
-            return node.leftChild;
-        } else if (node.rightChild != null) {
-            replaceParentsChild(node.parent, node, node.rightChild);
-            return node.rightChild;
-        } else {
-            RBNode newChild = node.color == BLACK ? new LeafNode() : null;
-            replaceParentsChild(node.parent, node, newChild);
-            return newChild;
-        }
-    }
-
-    private void handleRedSibling(RBNode node, RBNode sibling) {
-        sibling.color = BLACK;
-        node.parent.color = RED;
-
-        if (node == node.parent.leftChild)
-            rotateLeft(node.parent);
-        else
-            rotateRight(node.parent);
-    }
-
-    private void handleBlackSiblingWithAtLeastOneRedChild(RBNode node, RBNode sibling) {
-        boolean nodeIsLeftChild = node == node.parent.leftChild;
-
-        if (nodeIsLeftChild && sibling.rightChild.isBlack()) {
-            sibling.leftChild.color = BLACK;
-            sibling.color = RED;
-            rotateRight(sibling);
-            sibling = node.parent.rightChild;
-        } else if (!nodeIsLeftChild && sibling.leftChild.isBlack()) {
-            sibling.rightChild.color = BLACK;
-            sibling.color = RED;
-            rotateLeft(sibling);
-            sibling = node.parent.leftChild;
-        }
-
-        sibling.color = node.parent.color;
-        node.parent.color = BLACK;
-        if (nodeIsLeftChild) {
-            sibling.rightChild.color = BLACK;
-            rotateLeft(node.parent);
-        } else {
-            sibling.leftChild.color = BLACK;
-            rotateRight(node.parent);
-        }
-    }
-
-    private RBNode getSibling(RBNode node) {
-        RBNode parent = node.parent;
-        if (node == parent.leftChild) {
-            return parent.rightChild;
-        } else if (node == parent.rightChild) {
-            return parent.leftChild;
-        } else {
-            throw new IllegalStateException("Родитель не потомок своего прародителя");
-        }
-    }
-
-    private void fixedRBPropertiesAfterDelete(RBNode node) {
-        if (node == root) {
-            node.color = BLACK;
-            return;
-        }
-
-        RBNode sibling = getSibling(node);
-
-        if (sibling.color == RED) {
-            handleRedSibling(node, sibling);
-            sibling = getSibling(node);
-        }
-
-        if (sibling.leftChild.isBlack() && sibling.rightChild.isBlack()) {
-            sibling.color = RED;
-
-            if (node.parent.color == RED) {
-                node.parent.color = BLACK;
-            }
-
-            else {
-                fixedRBPropertiesAfterDelete(node.parent);
+        while (x != TNULL) {
+            y = x;
+            if (node.data < x.data) {
+                x = x.left;
+            } else {
+                x = x.right;
             }
         }
 
-        else {
-            handleBlackSiblingWithAtLeastOneRedChild(node, sibling);
-        }
-    }
-
-    private RBNode findMinimum(RBNode node) {
-        while (node.leftChild != null) {
-            node = node.leftChild;
-        }
-
-        return node;
-    }
-
-    public RBNode deleteNode(int key) {
-        RBNode node = root;
-
-        while (node != null && node.data != key) {
-            if (key < node.data)
-                node = node.leftChild;
-            else
-                node = node.rightChild;
-        }
-
-        if (node == null)
-            return null;
-
-        RBNode movedUpNode;
-        Color deletedNodeColor;
-
-        if (node.leftChild == null || node.rightChild == null) {
-            movedUpNode = deleteNodeWithZeroOrOneChild(node);
-            deletedNodeColor = node.color;
+        // y is parent of x
+        node.parent = y;
+        if (y == null) {
+            root = node;
+        } else if (node.data < y.data) {
+            y.left = node;
         } else {
-            RBNode inOrderSuccessor = findMinimum(node.rightChild);
-
-            node.data = inOrderSuccessor.data;
-
-            movedUpNode = deleteNodeWithZeroOrOneChild(inOrderSuccessor);
-            deletedNodeColor = inOrderSuccessor.color;
+            y.right = node;
         }
 
-        if (deletedNodeColor == BLACK) {
-            fixedRBPropertiesAfterDelete(movedUpNode);
-
-            if (movedUpNode.getClass() == LeafNode.class)
-                replaceParentsChild(movedUpNode.parent, movedUpNode, null);
+        // if new node is a root node, simply return
+        if (node.parent == null){
+            node.color = 0;
+            return;
         }
 
-        return node;
+        // if the grandparent is null, simply return
+        if (node.parent.parent == null) {
+            return;
+        }
+
+        // Fix the tree
+        fixInsert(node);
+    }
+
+    // delete the node from the tree
+    public void deleteNode(int data) {
+        deleteNodeHelper(this.root, data);
     }
 }
 
@@ -499,17 +469,9 @@ public class zadanie5_redblue {
     public static void main(String[] args)
     {
         RBTree tree = new RBTree();
-        tree.insertNode(50);
-        tree.insertNode(100);
-        tree.insertNode(0);
-//        tree.insertNode(2);
-//        tree.insertNode(4);
-//        tree.insertNode(10);
-
-        tree.root.print();
-        System.out.println(tree.root.rightChild.color);
-//        tree.insertNode(1);
-//        System.out.println(tree.root.leftChild.data);
+        tree.insert(100);
+        tree.insert(50);
+        tree.insert(200);
 
         RBCanvasPrinter printer = new RBCanvasPrinter();
         printer.nodePrint(tree.root, tree);
