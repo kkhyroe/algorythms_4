@@ -34,7 +34,14 @@ class HashTable2 {
             return;
         }
 
+        long startTime = System.nanoTime();
+
         int hashing1 = myHash(key);
+
+        System.out.println("");
+        System.out.println("Скорость линейного пробирования");
+        System.out.println((System.nanoTime() - startTime));
+        System.out.println("");
 
         table[hashing1] = new ValueEntry2(key, value);
         size++;
@@ -57,8 +64,6 @@ class HashTable2 {
     // Метод умножения (√5-1) / 2 - константа
     private int myHash(String y)
     {
-        long startTime = System.nanoTime();
-
         int myHashVal1 = y.hashCode();
 
         myHashVal1 = (int) Math.round(HASH_TABLE_SIZE * (myHashVal1 * (((Math.sqrt(5) - 1) / 2)) % 1));
@@ -66,10 +71,6 @@ class HashTable2 {
         if (myHashVal1 < 0)
             myHashVal1 += HASH_TABLE_SIZE;
 
-        System.out.println("");
-        System.out.println("Скорость хэширования умножением");
-        System.out.println((System.nanoTime() - startTime));
-        System.out.println("");
         return myHashVal1;
     }
 
@@ -77,8 +78,7 @@ class HashTable2 {
     {
         for (int i = 0; i < HASH_TABLE_SIZE; i++)
             if (table[i] != null)
-                System.out.println(table[i].key + " "
-                        + table[i].value);
+                System.out.println(table[i].key + " " + table[i].value);
     }
 }
 
