@@ -100,8 +100,6 @@ class Heap {
 
 
 public class zadanie7 {
-    // Method 10
-    // main dri er method
     public static void main(String[] arg)
     {
         Heap maxHeap = new Heap(15);
@@ -120,8 +118,6 @@ public class zadanie7 {
         maxHeap.remove();
         maxHeap.remove();
 
-
-        // Calling maxHeap() as defined above
         maxHeap.print();
 
 

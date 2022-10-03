@@ -147,11 +147,11 @@ class RBCanvasPrinter extends RBNodePrinter {
 }
 
 class RBNode {
-    int data; // holds the key
-    RBNode parent; // pointer to the parent
-    RBNode left; // pointer to left child
-    RBNode right; // pointer to right child
-    int color; // 1 . Red, 0 . Black
+    int data;
+    RBNode parent;
+    RBNode left;
+    RBNode right;
+    int color;
 }
 
 class RBTree {
@@ -177,14 +177,12 @@ class RBTree {
         return searchTreeHelper(node.right, key);
     }
 
-    // fix the rb tree modified by the delete operation
     private void fixDelete(RBNode x) {
         RBNode s;
         while (x != root && x.color == 0) {
             if (x == x.parent.left) {
                 s = x.parent.right;
                 if (s.color == 1) {
-                    // case 3.1
                     s.color = 0;
                     x.parent.color = 1;
                     leftRotate(x.parent);
@@ -192,19 +190,16 @@ class RBTree {
                 }
 
                 if (s.left.color == 0 && s.right.color == 0) {
-                    // case 3.2
                     s.color = 1;
                     x = x.parent;
                 } else {
                     if (s.right.color == 0) {
-                        // case 3.3
                         s.left.color = 0;
                         s.color = 1;
                         rightRotate(s);
                         s = x.parent.right;
                     }
 
-                    // case 3.4
                     s.color = x.parent.color;
                     x.parent.color = 0;
                     s.right.color = 0;
@@ -214,7 +209,6 @@ class RBTree {
             } else {
                 s = x.parent.left;
                 if (s.color == 1) {
-                    // case 3.1
                     s.color = 0;
                     x.parent.color = 1;
                     rightRotate(x.parent);
@@ -222,19 +216,16 @@ class RBTree {
                 }
 
                 if (s.right.color == 0 && s.right.color == 0) {
-                    // case 3.2
                     s.color = 1;
                     x = x.parent;
                 } else {
                     if (s.left.color == 0) {
-                        // case 3.3
                         s.right.color = 0;
                         s.color = 1;
                         leftRotate(s);
                         s = x.parent.left;
                     }
 
-                    // case 3.4
                     s.color = x.parent.color;
                     x.parent.color = 0;
                     s.left.color = 0;
@@ -258,7 +249,6 @@ class RBTree {
     }
 
     private void deleteNodeHelper(RBNode node, int key) {
-        // find the node containing key
         RBNode z = TNULL;
         RBNode x, y;
         while (node != TNULL){
@@ -308,25 +298,21 @@ class RBTree {
         }
     }
 
-    // fix the red-black tree
     private void fixInsert(RBNode k){
         RBNode u;
         while (k.parent.color == 1) {
             if (k.parent == k.parent.parent.right) {
-                u = k.parent.parent.left; // uncle
+                u = k.parent.parent.left;
                 if (u.color == 1) {
-                    // case 3.1
                     u.color = 0;
                     k.parent.color = 0;
                     k.parent.parent.color = 1;
                     k = k.parent.parent;
                 } else {
                     if (k == k.parent.left) {
-                        // case 3.2.2
                         k = k.parent;
                         rightRotate(k);
                     }
-                    // case 3.2.1
                     k.parent.color = 0;
                     k.parent.parent.color = 1;
                     leftRotate(k.parent.parent);
@@ -335,18 +321,15 @@ class RBTree {
                 u = k.parent.parent.right; // uncle
 
                 if (u.color == 1) {
-                    // mirror case 3.1
                     u.color = 0;
                     k.parent.color = 0;
                     k.parent.parent.color = 1;
                     k = k.parent.parent;
                 } else {
                     if (k == k.parent.right) {
-                        // mirror case 3.2.2
                         k = k.parent;
                         leftRotate(k);
                     }
-                    // mirror case 3.2.1
                     k.parent.color = 0;
                     k.parent.parent.color = 1;
                     rightRotate(k.parent.parent);
@@ -359,13 +342,10 @@ class RBTree {
         root.color = 0;
     }
 
-    // search the tree for the key k
-    // and return the corresponding node
     public RBNode searchTree(int key) {
         return searchTreeHelper(this.root, key);
     }
 
-    // find the node with the minimum key
     public RBNode minimum(RBNode node) {
         while (node.left != TNULL) {
             node = node.left;
@@ -392,7 +372,6 @@ class RBTree {
         x.parent = y;
     }
 
-    // rotate right at node x
     public void rightRotate(RBNode x) {
         RBNode y = x.left;
         x.left = y.right;
@@ -411,16 +390,13 @@ class RBTree {
         x.parent = y;
     }
 
-    // insert the key to the tree in its appropriate position
-    // and fix the tree
     public void insert(int key) {
-        // Ordinary Binary Search Insertion
         RBNode node = new RBNode();
         node.parent = null;
         node.data = key;
         node.left = TNULL;
         node.right = TNULL;
-        node.color = 1; // new node must be red
+        node.color = 1;
 
         RBNode y = null;
         RBNode x = this.root;
@@ -434,7 +410,6 @@ class RBTree {
             }
         }
 
-        // y is parent of x
         node.parent = y;
         if (y == null) {
             root = node;
@@ -444,22 +419,18 @@ class RBTree {
             y.right = node;
         }
 
-        // if new node is a root node, simply return
         if (node.parent == null){
             node.color = 0;
             return;
         }
 
-        // if the grandparent is null, simply return
         if (node.parent.parent == null) {
             return;
         }
 
-        // Fix the tree
         fixInsert(node);
     }
 
-    // delete the node from the tree
     public void deleteNode(int data) {
         deleteNodeHelper(this.root, data);
     }

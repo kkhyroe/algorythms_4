@@ -160,7 +160,8 @@ public class zadanie3 {
             Solution sol = new Solution();
             global = String.valueOf(sol.calculate(global));
             if (global.equals("-1")) {
-                t.setText("Ошибка (текст)");
+//                t.setText("Ошибка (текст)");
+                t.setText(global);
             } else {
                 t.setText(global);
             }
@@ -201,29 +202,29 @@ class Solution {
     char[] arr;
     int index = 0;
 
-    public int calculate(String s) {
+    public float calculate(String s) {
         arr = s.toCharArray();
         return dfs();
     }
 
-    private int dfs() {
-        Stack<Integer> stack = new Stack<>();
+    private float dfs() {
+        Stack<Float> stack = new Stack<>();
         char operator = '+';
 
         while (index < arr.length) {
             if (arr[index] != ' ') {
                 if (Character.isDigit(arr[index])) {
                     StringBuilder buildNum = new StringBuilder();
-                    while (index < arr.length && Character.isDigit(arr[index])) {
+                    while ((index < arr.length && Character.isDigit(arr[index])) || (index < arr.length && arr[index] == '.')) {
                         buildNum.append(arr[index++]);
                     }
                     index--;
 
-                    int curNum = Integer.parseInt(buildNum.toString());
+                    float curNum = Float.parseFloat(buildNum.toString());
                     insertElement(stack, curNum, operator);
                 } else if (arr[index] == '(') {
                     index++;
-                    int curNum = dfs();
+                    float curNum = dfs();
                     insertElement(stack, curNum, operator);
                 } else if (arr[index] == ')') {
                     break;
@@ -236,14 +237,14 @@ class Solution {
             index++;
         }
 
-        int total = 0;
+        float total = 0;
         while (!stack.isEmpty()) {
             total += stack.pop();
         }
         return total;
     }
 
-    private void insertElement(Stack<Integer> stack, int curNum, char operator) {
+    private void insertElement(Stack<Float> stack, float curNum, char operator) {
         if (operator == '-') {
             curNum *= -1;
         } else if (operator == '*') {

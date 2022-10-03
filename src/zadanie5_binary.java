@@ -143,10 +143,8 @@ class CanvasPrinter extends NodePrinter {
 
                 for(Component comp : cList){
 
-                    //Find the components you want to remove
                     if(comp instanceof JTree){
 
-                        //Remove it
                         c.remove(comp);
                     }
                 }
